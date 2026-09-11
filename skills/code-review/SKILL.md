@@ -66,6 +66,8 @@ nonexistent command to perform a review. Ask only for a genuinely missing
 fixed point, spec, or new external authority after available independent
 inspection is complete.
 
+For existing data, persisted state, or integration changes, apply the [repository-backed acceptance contract](../implement/references/agent-workflow.md#repository-backed-acceptance-contract) as part of the Spec review. Verify fixture validity, coverage through a relevant caller or boundary, independently grounded expected results, and preservation or rollback evidence including newer evidence where applicable. Unsupported fixture assumptions or missing acceptance evidence cannot pass merely because tests are green.
+
 ## Standards axis
 
 Find the repository's documented standards, such as contribution or coding

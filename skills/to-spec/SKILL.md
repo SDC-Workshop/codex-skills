@@ -21,6 +21,8 @@ Treat user decisions and accepted ADRs as authoritative. Do not ask the user to 
 
 Give the spec a stable identity and revision, and preserve its lineage when revising it. Assign stable requirement IDs such as `REQ-001`; each requirement describes observable behavior and the evidence that will prove acceptance. Record the contracts and invariants that tickets must preserve, including API, schema, UI, or integration boundaries when they apply.
 
+For existing data, persisted state, or integration changes, record compatibility and preservation requirements under the [repository-backed acceptance contract](../implement/references/agent-workflow.md#repository-backed-acceptance-contract), including history, newer evidence, and failure or rollback outcomes where relevant. Reference existing repository evidence rather than invent input formats.
+
 Group implementation into bounded work packages such as `WP-001`. For each package, state its verifiable outcome, contract ownership, dependencies, scope exclusions, and the acceptance evidence expected from implementation, review, and supervision. Resolve architecture before ticket dispatch. Preserve vertical slices, genuine blockers, behavior-based testing, and the safe expand, migrate, and contract sequence for wide mechanical refactors.
 
 Record two CODING attempts per execution round and at most two ARCHITECT returns for each prospective ticket. The first failed attempt stays with ORCHESTRATOR for one focused second attempt. Two failed attempts in the same round trigger an ARCHITECT return. The second return opens the final round, for a maximum of six attempts. Replacement workers, renaming, splitting, or a fresh context cannot reset a ticket's identity, lineage, attempts, or remaining budget.

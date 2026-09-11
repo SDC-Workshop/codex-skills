@@ -70,6 +70,26 @@ next-ticket context.
 
 Monitor context pressure during a ticket and prepare a compact same-ticket handoff before essential state becomes difficult to retain. This supplements the required fresh context between tickets; it does not authorize an unrecorded mid-ticket reset.
 
+## Repository-backed acceptance contract
+
+For changes involving existing data, persisted state, or integration boundaries, ORCHESTRATOR must establish a compact acceptance contract from repository evidence before dispatching CODING work. Reuse existing evidence and record references and outcomes in the existing ticket or six-line handoff. Inspect only the relevant paths; no separate document, broad audit, agent, or approval stage is required.
+
+Identify:
+
+- The actual reader, writer, validator, and relevant calling path, with repository references. If one is absent, record that fact rather than inventing it.
+- Representative supported input shapes and identifier formats, including how references resolve to separately stored records.
+- Compatible behavior and evidence that must survive, including preserved history and newer evidence where applicable.
+- Existing tests or validated fixtures that demonstrate these contracts, and any uncovered cases.
+- Exact acceptance checks and expected outcomes through a relevant existing caller or boundary, including failure and rollback behavior where relevant.
+
+ORCHESTRATOR resolves documented repository behavior directly. Missing or conflicting architectural requirements go to ARCHITECT with the evidence and one recommended resolution; hold affected coding work rather than invent a contract or ask the human to resolve routine engineering details.
+
+Reuse existing validated fixtures where possible. Otherwise ORCHESTRATOR identifies the required shapes and checks, and CODING creates minimal synthetic fixtures derived from repository schemas, validators, and callers within the same bounded coding assignment. CODING alone writes implementation and tests. Never copy production secrets or private data. ORCHESTRATOR verifies fixture representativeness against those sources during ordinary review before relying on the results as acceptance evidence, without a separate approval ceremony.
+
+Review must verify that fixtures match the supported input contract, checks exercise the changed behavior through a relevant existing caller or boundary, and expected results follow from requirements and repository evidence rather than mirroring the implementation. Preservation and rollback claims must cover newer evidence where applicable, not just restore an older snapshot. Passing tests based on unsupported assumptions do not establish acceptance. Report missing acceptance evidence as incomplete, not passed.
+
+This work uses the existing ticket, ownership, review, and candidate-integrity rules. It creates no additional attempt or return allowance and never resets counters. Any failed or incomplete submitted attempt follows the existing failure lifecycle.
+
 ## Durable execution record
 
 ORCHESTRATOR owns one durable record per ticket. Use the native tracker record when it

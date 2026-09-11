@@ -25,6 +25,8 @@ Every package must have stable requirement IDs, acceptance evidence, a spec revi
 
 Preserve vertical slices that are independently demoable or verifiable. Keep prefactoring inside a real end-to-end slice when possible. A wide mechanical refactor is sequenced as expand, migrate batches, and contract. Each migrate batch remains green while the old form exists, and the contract ticket blocks on every migrate batch. If batches cannot stay green independently, use an integration-and-verify ticket that all relevant batches block.
 
+Carry the relevant [repository-backed acceptance contract](../implement/references/agent-workflow.md#repository-backed-acceptance-contract) references and acceptance outcomes into the existing ticket and handoff. Include supported record references, compatibility, preservation, and relevant failure or rollback outcomes. ORCHESTRATOR verifies the evidence before dispatch; any synthetic fixture work belongs to the same CODING assignment.
+
 ### 3. Draft durable tickets
 
 Use one stable ticket identity per outcome and preserve its lineage across revisions, workers, renaming, splitting, and fresh contexts. Record the spec revision, requirement IDs, contract and dependency state, ownership, candidate/base evidence, checks, status, `retry_policy`, `execution_round`, `round_attempts_started`, `attempts_started`, `architect_returns_used`, remaining budget, and next action before transitions. Missing state must be recovered from durable history or reported unavailable, never guessed as zero.

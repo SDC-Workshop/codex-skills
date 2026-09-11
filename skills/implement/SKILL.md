@@ -32,6 +32,8 @@ seams. If a required product decision, contract, dependency, or authority is
 missing, record the blocker and send it to ORCHESTRATOR for ARCHITECT. Do not reopen settled
 test seams or ticket sizing.
 
+Before dispatch for changes involving existing data, persisted state, or integration boundaries, ORCHESTRATOR resolves and verifies the [repository-backed acceptance contract](references/agent-workflow.md#repository-backed-acceptance-contract) in the existing ticket or handoff. Resolve documented behavior directly; escalate only missing or conflicting architectural requirements. Fixture creation stays with CODING in the same assignment, and ORCHESTRATOR verifies representativeness before accepting its results.
+
 Before dispatch, recover the durable record. It must preserve stable ticket
 identity and lineage, spec and ticket revisions, owner and active workers,
 dependency state, retry_policy, execution_round, round_attempts_started, attempts_started, architect_returns_used, remaining budget,
