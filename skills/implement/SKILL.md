@@ -121,7 +121,7 @@ record.
 
 ## Failed attempts and revisions
 
-Each execution round permits two CODING attempts. After the first failed attempt, ORCHESTRATOR records the defects and directs a focused second attempt under the current ticket. After the second failed attempt in that round, ORCHESTRATOR increments `architect_returns_used`, pauses implementation, and sends its evidence and recommendation to ARCHITECT.
+Each execution round permits two CODING attempts. After the first failed attempt, ORCHESTRATOR records the defects and directs a focused second attempt under the current ticket. After the second failed attempt in that round, ORCHESTRATOR applies the shared conditional return rule: use a remaining ARCHITECT return or mark the ticket exhausted.
 
 ARCHITECT approves or revises the ticket, affected contracts, and dependent tickets, then returns it to ORCHESTRATOR. A ticket may return to ARCHITECT at most twice. The second return opens the final round, so the full ceiling is six attempts. If attempt 6 fails, mark the ticket blocked and exhausted without another return. Persist `execution_round`, `round_attempts_started`, `attempts_started`, and `architect_returns_used`; replacement workers, splitting, renaming, or context changes never reset them. Migrate a legacy `astra_returns_used` value without resetting it.
 

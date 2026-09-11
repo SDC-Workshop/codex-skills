@@ -18,11 +18,13 @@ The titles ARCHITECT, ORCHESTRATOR, and CODING describe authority, not model ide
 
 The current replaceable runtime profile assigns ARCHITECT to `gpt-6-astra` at medium effort. It assigns ORCHESTRATOR to `gpt-6-astra` at low effort or `gpt-5.6-sol` at medium effort, with Sol medium as the default. It assigns CODING agents to `gpt-5.6-luna` at medium, high, xhigh, or max effort, with medium as the default. These are current assignments, not role definitions. Another model or provider may fill any role when the configured profile grants that role and the model can perform it. Select and verify profiles through supported runtime controls. Record the actual provider, model, effort, invocation identity, and dynamic handles in the ticket record. ARCHITECT and ORCHESTRATOR must be separate invocations even when both use the same model family.
 
+Choose model capability and reasoning effort separately for each assignment within supported profile settings. Use the least expensive suitable assignment; a role title does not imply high reasoning effort. Diagnose unclear requirements, environment failures, and ownership conflicts before escalating model cost. Record routing as requested, confirmed by runtime evidence, or unavailable. A model self-report is not runtime confirmation.
+
 A future model or provider change updates this profile without changing the role definitions. Do not put model selectors in skill metadata or silently grant a substitute model broader authority.
 
 ## When this workflow applies
 
-Use this chain when the user invokes one of its skills or asks to execute work through the multi-agent workflow. Do not activate or simulate the chain merely because a task mentions agents, roles, models, tickets, retries, or these skill files. Editing the workflow documentation is a direct documentation task unless the user explicitly requests a multi-agent run. Match the execution method to the requested deliverable and avoid auxiliary specs, tickets, agents, and review ceremonies that do not improve that deliverable.
+Before starting coordination, identify the requested deliverable and choose the smallest sufficient process. Invoking one skill activates that stage and its required checks, not every stage of the chain. Use the full chain when the user requests it or the implementation requires its planning and coordination. Simple tasks do not require multiple agents merely because those agents are available. Do not activate or simulate the chain merely because a task mentions agents, roles, models, tickets, retries, or these skill files. Editing the workflow documentation is a direct documentation task unless the user explicitly requests a multi-agent run. Match the execution method to the requested deliverable and avoid auxiliary specs, tickets, agents, and review ceremonies that do not improve that deliverable.
 
 ## Ticket and context boundary
 
@@ -66,6 +68,8 @@ and exclusive ownership, do not dispatch a duplicate, and resume only after its
 state is known. A mid-ticket restart is neither a new attempt nor a fresh
 next-ticket context.
 
+Monitor context pressure during a ticket and prepare a compact same-ticket handoff before essential state becomes difficult to retain. This supplements the required fresh context between tickets; it does not authorize an unrecorded mid-ticket reset.
+
 ## Durable execution record
 
 ORCHESTRATOR owns one durable record per ticket. Use the native tracker record when it
@@ -92,7 +96,7 @@ transition:
   Spec verdict, and supervisory verdict;
 - the smallest unresolved issue, remaining budget, and next action.
 
-Use `retry_policy: two-attempt-rounds-v2`. New records start with `execution_round: 1`, `round_attempts_started: 0`, `attempts_started: 0`, and `architect_returns_used: 0`. Each round permits two attempts. Persist both attempt counters immediately before dispatch. After two failed attempts in a round, increment `architect_returns_used` once before the ARCHITECT return. A completed return opens the next round and resets only `round_attempts_started`. Never reset total attempts or returns. Two returns permit round 3, including attempts 5 and 6. Failure of attempt 6 exhausts the ticket without a third return or attempt 7. Missing counters must be recovered from durable history, never guessed as zero. When resuming a legacy record, migrate `astra_returns_used` to `architect_returns_used` without changing its value.
+Use `retry_policy: two-attempt-rounds-v2`. New records start with `execution_round: 1`, `round_attempts_started: 0`, `attempts_started: 0`, and `architect_returns_used: 0`. Each round permits two attempts. Persist both attempt counters immediately before dispatch. Apply the conditional return rule in the attempt lifecycle below; do not increment a return merely because a round ended. A completed return opens the next round and resets only `round_attempts_started`. Never reset total attempts or returns. Two returns permit round 3, including attempts 5 and 6. Failure of attempt 6 exhausts the ticket without a third return or attempt 7. Missing counters must be recovered from durable history, never guessed as zero. When resuming a legacy record, migrate `astra_returns_used` to `architect_returns_used` without changing its value.
 
 Keep candidate evidence tied to the recorded base. For a committed candidate,
 record the resolved base and candidate commits or hashes. For a candidate
@@ -113,11 +117,11 @@ before acceptance. A changed digest cannot receive ARCHITECT acceptance.
 
 An attempt is one planned CODING pass, one submitted candidate, and ORCHESTRATOR review. Normal build, test, and debugging work before submission stays inside that attempt. Multiple CODING agents collaborating on one candidate share one attempt.
 
-After the first failed attempt in a round, ORCHESTRATOR freezes the rejected candidate, records the defects, and may dispatch a focused second attempt under the current ticket. CODING agents cannot authorize their own repair. After the second failed attempt in that round, ORCHESTRATOR freezes writers, increments `architect_returns_used`, and sends the evidence plus one recommended change to ARCHITECT. No implementation proceeds while that return is pending.
+After the first failed attempt in a round, ORCHESTRATOR freezes the rejected candidate, records the defects, and may dispatch a focused second attempt under the current ticket. CODING agents cannot authorize their own repair. After the second failed attempt in that round, ORCHESTRATOR freezes writers. If `architect_returns_used` is less than 2, increment it once and send the evidence plus one recommended change to ARCHITECT. Otherwise mark the ticket blocked and exhausted, with no further return or dispatch. No implementation proceeds while a return is pending.
 
 ARCHITECT approves or revises the ticket, affected contracts, and dependent tickets. ORCHESTRATOR records the response, reconciles readiness, opens the next round, and directs CODING agents. This return may happen at most twice per ticket. After the second return, round 3 still has two attempts. If both fail, mark the ticket blocked and exhausted. Replacement workers, ticket renaming, splitting, fresh contexts, and repeated messages never reset or double-count the budget.
 
-Successful work proceeds without using the other attempt or asking the user to approve work already authorized. A missing product or architecture decision remains a blocker and returns to ARCHITECT without inventing an implementation attempt. If ARCHITECT changes a requirement or dependency, hold affected downstream tickets, update their revisions and contracts, and preserve evidence that remains valid.
+Successful work proceeds without using the other attempt or asking the user to approve work already authorized. Two attempts are an allowance, not an obligation to repeat known-invalid work. If an attempt exposes a missing contract, impossible requirement, or unresolved product decision, hold affected work and seek ARCHITECT clarification immediately. Clarification does not create another implementation attempt or reset the budget. A change that remedies a failed implementation remains subject to the two-return ceiling; do not disguise a failure revision as clarification. If ARCHITECT changes a requirement or dependency, hold affected downstream tickets, update their revisions and contracts, and preserve evidence that remains valid.
 
 ## Six-line handoff
 
@@ -176,6 +180,8 @@ does not replace that route. ARCHITECT's handoff to ORCHESTRATOR includes the sa
 revision, authority, evidence, budget, and check fields inside these six
 labels.
 
+Give each worker only its assignment, relevant contracts, owned files, and required checks. Use a fresh bounded worker context by default. Inherit the full parent transcript only when specific needed information cannot be supplied in the handoff.
+
 ## Concurrent workers and communication
 
 Multiple CODING workers may work concurrently inside one active ticket only when
@@ -197,6 +203,8 @@ and completion evidence to ORCHESTRATOR. Silence, a peer's approval, or a passin
 check is not a completion signal. Do not clear the ticket context while any
 current worker is writing.
 
+Prefer completion events or blocking waits while workers run. Do useful independent work when available; otherwise wait. Avoid repeated status polling, unchanged progress narration, and rereading the same output. Investigate only a meaningful result, blocker, or evidence of a stalled worker.
+
 ## Acceptance and completion
 
 CODING is done when the owned implementation and its evidence are submitted
@@ -214,8 +222,7 @@ completion until ARCHITECT accepts the exact frozen candidate.
 
 ARCHITECT is done when the recorded ORCHESTRATOR evidence satisfies the current spec,
 ticket, and contracts. ARCHITECT may revise planning and review records and
-affected contracts. ARCHITECT does not take over implementation coding, conflict
-resolution, or an open-ended duplicate audit.
+affected contracts. ARCHITECT checks conformity with architectural decisions and unresolved contract issues. ORCHESTRATOR verifies the implementation and its evidence. ARCHITECT does not repeat the full code review or take over implementation coding or conflict resolution. Review depth follows the consequences of a defect; one review with no findings is not evidence that future review is unnecessary.
 
 Keep the original local-commit behavior unless the user or repository
 instructions override it. After ARCHITECT accepts the exact frozen candidate, ORCHESTRATOR
@@ -232,3 +239,7 @@ completion conditions does ORCHESTRATOR record the ticket complete, persist the
 next-ticket handoff, end that ticket's workers, and make the next frontier
 eligible. Keep validation evidence separate from claims of production or
 end-to-end execution.
+
+## Delegation feedback
+
+When delegation causes substantial rework, delay, or unnecessary agent use, give a brief exception report: requested versus confirmed routing, the observed problem, and one concrete adjustment. Use measured time or usage when available and label unavailable measurements honestly. Include coordination, review, and rework when assessing efficiency. Routine small tasks need no delegation retrospective. A report does not create persistent learning; do not automatically rewrite policy from one outcome or an agent self-assessment.
